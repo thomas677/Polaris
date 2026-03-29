@@ -1,0 +1,79 @@
+<svg viewBox="0 0 220 175" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gM" x1="30%" y1="0%" x2="70%" y2="100%">
+      <stop offset="0%" stop-color="#00e8ff"/>
+      <stop offset="50%" stop-color="#0099ff"/>
+      <stop offset="100%" stop-color="#0044ee"/>
+    </linearGradient>
+    <linearGradient id="gS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0055cc"/>
+      <stop offset="100%" stop-color="#001f99"/>
+    </linearGradient>
+    <linearGradient id="gH" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0088ee"/>
+      <stop offset="100%" stop-color="#55eeff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main body silhouette -->
+  <path d="
+    M 210,95
+    L 212,108 L 200,115 L 190,120
+    L 185,128 L 182,165 L 172,168 L 163,168 L 165,162 L 172,125
+    L 162,130
+    L 150,125 L 147,162 L 138,168 L 128,168 L 130,162 L 135,128
+    C 120,118 100,110 82,110 C 75,110 68,112 62,116
+    L 58,124 L 55,165 L 45,168 L 35,168 L 38,162 L 42,125
+    L 36,122
+    L 30,120 L 28,162 L 18,168 L 8,168 L 11,162 L 18,125
+    L 10,115 L 5,100 L 5,82 L 12,70 L 26,62
+    C 45,54 78,46 115,44 C 140,43 162,45 175,48
+    L 183,53 L 188,46 L 192,36 L 192,22 L 182,16 L 178,5 L 170,18
+    L 180,25 L 192,32 L 200,43 L 206,54
+    L 212,72 C 214,80 213,88 210,95 Z
+  " fill="url(#gM)"/>
+
+  <!-- Under-belly shadow -->
+  <path d="
+    M 62,126 C 82,118 110,116 148,118 C 168,119 182,124 190,128
+    L 188,140 C 180,136 165,132 148,130 C 110,128 80,130 62,140 Z
+  " fill="url(#gS)" opacity="0.52"/>
+
+  <!-- Chest shadow notch -->
+  <path d="M 190,122 L 176,130 L 190,138 Z" fill="#001f99" opacity="0.5"/>
+
+  <!-- Belly angular fur notch -->
+  <path d="M 142,118 L 135,128 L 150,126 Z" fill="#001f99" opacity="0.38"/>
+
+  <!-- Haunch / rump shadow -->
+  <path d="
+    M 18,112 C 28,107 42,110 48,120
+    L 42,132 C 34,124 20,122 10,128 Z
+  " fill="url(#gS)" opacity="0.48"/>
+
+  <!-- Between front legs dark notch -->
+  <path d="M 162,130 L 152,138 L 168,138 Z" fill="#001f99" opacity="0.35"/>
+
+  <!-- Spine / back highlight -->
+  <path d="M 175,50 C 148,44 118,43 88,48 C 65,52 42,60 28,70"
+    stroke="#66eeff" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.42"/>
+
+  <!-- Head highlight -->
+  <path d="M 192,24 C 185,19 180,17 178,7"
+    stroke="#66eeff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Shoulder highlight arc -->
+  <path d="M 185,56 C 175,52 162,50 148,50"
+    stroke="#44ddff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Eye -->
+  <circle cx="200" cy="58" r="6.5" fill="#001055"/>
+  <circle cx="201.8" cy="56.5" r="2.8" fill="#88eeff"/>
+
+  <!-- Nose -->
+  <ellipse cx="214" cy="83" rx="7" ry="5.5" fill="#001055"/>
+  <ellipse cx="213" cy="82" rx="3.5" ry="2.8" fill="#00082e"/>
+
+  <!-- Ear inner detail -->
+  <polygon points="178,6 184,18 172,20" fill="#0044cc" opacity="0.55"/>
+</svg>

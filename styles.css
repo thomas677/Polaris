@@ -187,7 +187,7 @@ body {
   gap: 10px;
   text-decoration: none;
 }
-.logo-icon svg { width: 42px; height: 42px; }
+.logo-bear { width: 42px; height: 42px; object-fit: contain; }
 .logo-name {
   font-family: var(--font-head);
   font-size: 1.5rem;
@@ -502,7 +502,7 @@ body {
 }
 
 .footer-logo .logo-name { font-size: 1.6rem; }
-.footer-logo .logo-icon svg { width: 48px; height: 48px; }
+.footer-logo .logo-bear { width: 52px; height: 52px; }
 
 .footer-nav {
   margin-bottom: 28px;

@@ -193,6 +193,11 @@ body {
   object-fit: contain;
   mix-blend-mode: screen;
 }
+.logo-text-img {
+  height: 32px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+}
 .logo-name {
   font-family: var(--font-head);
   font-size: 1.5rem;

@@ -293,6 +293,23 @@ body {
 .dot.active { background: var(--green); }
 
 /* ============================================
+   TRADING SECTION
+   ============================================ */
+.trading-section {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: block;
+  background: #fff;
+}
+.trading-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* ============================================
    ABOUT
    ============================================ */
 .about {

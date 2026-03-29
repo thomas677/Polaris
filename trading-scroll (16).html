@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Chart</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#fff; }
+  canvas { position:fixed; top:0; left:0; }
+  .fade { position:fixed; pointer-events:none; z-index:10; }
+  #fr { top:0; right:0; width:180px; height:100%; background:linear-gradient(to left,#fff 20%,transparent); }
+  #fl { top:0; left:0;  width:50px;  height:100%; background:linear-gradient(to right,#fff,transparent); }
+  #ft { top:0; left:0; right:0; height:60px; background:linear-gradient(to bottom,#fff,transparent); }
+  #fb { bottom:0; left:0; right:0; height:60px; background:linear-gradient(to top,#fff,transparent); }
+  #hint {
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+    font-family:Georgia,serif; font-size:11px; letter-spacing:.2em; color:#ccc;
+    text-transform:uppercase; z-index:20; transition:opacity .5s;
+    display:flex; flex-direction:column; align-items:center; gap:7px;
+  }
+  .ch {
+    width:11px; height:11px;
+    border-right:1px solid #ddd; border-bottom:1px solid #ddd;
+    transform:rotate(45deg); animation:bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{transform:rotate(45deg) translate(0,0);opacity:1}
+    50%{transform:rotate(45deg) translate(3px,3px);opacity:.3}
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="fade" id="fr"></div>
+<div class="fade" id="fl"></div>
+<div class="fade" id="ft"></div>
+<div class="fade" id="fb"></div>
+<div id="hint"><span>scroll</span><div class="ch"></div></div>
+<script>
+const cv  = document.getElementById('c');
+const ctx = cv.getContext('2d');
+
+// ── Taille canvas ────────────────────────────────────────────────
+function resize(){
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', ()=>{ resize(); draw(); });
+
+// ── Génération bougies ───────────────────────────────────────────
+function rnd(a,b){ return a + Math.random()*(b-a); }
+let _price=100, _drift=0, _sigma=0.007;
+function newCandle(){
+  _drift = _drift*0.96 + (Math.random()-0.502)*0.002;
+  _drift = Math.max(-0.01, Math.min(0.01, _drift));
+  _sigma = Math.max(0.003, Math.min(0.02, _sigma*(0.94+Math.random()*0.1)+0.0005));
+  let o=_price, p=o, hi=o, lo=o;
+  for(let i=0;i<20;i++){
+    p += p*(_drift/20 + (Math.random()-0.5)*2*_sigma/Math.sqrt(20));
+    hi=Math.max(hi,p); lo=Math.min(lo,p);
+  }
+  const body=Math.abs(p-o), wm=rnd(0.2,1.2);
+  hi=Math.max(hi, Math.max(o,p)+body*wm*rnd(0.1,0.4));
+  lo=Math.min(lo, Math.min(o,p)-body*wm*rnd(0.1,0.4));
+  _price = p;
+  return {o, h:hi, l:lo, c:p};
+}
+
+// Seed initial
+const candles = [];
+for(let i=0;i<200;i++) candles.push(newCandle());
+
+// ── Layout ───────────────────────────────────────────────────────
+const STEP   = 8;  // px entre centres bougies
+const CW     = 5;  // largeur corps
+const PAD    = 0.08;// padding vertical
+
+// scrolled = nb de bougies décalées (continu)
+// 0 → bougie la plus récente au centre
+// 1 → bougie suivante au centre
+let scrolled = 0;
+
+// ── Draw ─────────────────────────────────────────────────────────
+function draw(){
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+
+  // S'assurer qu'il y a assez de bougies
+  while(candles.length < 200 + Math.ceil(scrolled) + 10)
+    candles.push(newCandle());
+
+  const N = candles.length;
+
+  // La bougie "ancrée au centre" est celle d'index : N-1-floor(scrolled) ... non.
+  // Logique :
+  //   scrolled=0 → bougie index N-1 (la plus récente) est au centre
+  //   scrolled=1 → bougie index N   (nouvelle générée) est au centre
+  //   scrolled=S → bougie index N-1+S est au centre
+  //
+  // Position de la bougie d'index i dans le tableau :
+  //   x = centerX + (i - centerIdx) * STEP
+  //   centerIdx = N - 1 + scrolled  (peut être non-entier)
+  //
+  // Donc : x(i) = W/2 + (i - (N-1+scrolled)) * STEP
+  //             = W/2 + (i - N + 1 - scrolled) * STEP
+
+  const centerIdx = N - 1 + scrolled; // index (réel) de la bougie au centre
+
+  // Prix min/max sur la fenêtre visible
+  let minP=1e18, maxP=-1e18;
+  for(let i=0;i<N;i++){
+    const x = W/2 + (i - centerIdx)*STEP;
+    if(x < -STEP || x > W+STEP) continue;
+    minP=Math.min(minP,candles[i].l);
+    maxP=Math.max(maxP,candles[i].h);
+  }
+  if(minP===1e18){ // aucune bougie visible — ne devrait pas arriver
+    minP=90; maxP=110;
+  }
+  const spread = (maxP-minP)||1;
+  const vpad   = spread*0.13;
+  minP-=vpad; maxP+=vpad;
+  const range  = maxP-minP;
+  const ph     = H*PAD, ch = H-ph*2;
+  function yp(p){ return ph + ch*(1-(p-minP)/range); }
+
+  // Grille horizontale légère
+  ctx.strokeStyle='rgba(0,0,0,0.045)'; ctx.lineWidth=.5;
+  for(let i=1;i<=5;i++){
+    const y=ph+ch*(i/6);
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  // Dessiner chaque bougie
+  for(let i=0;i<N;i++){
+    const x = Math.round(W/2 + (i - centerIdx)*STEP);
+    if(x < -STEP*2 || x > W+STEP*2) continue;
+
+    const cd = candles[i];
+
+    // Fondu : la bougie qui est encore à droite du centre arrive en glissant
+    // Elle n'est visible que quand elle passe W/2. Fondu sur 1 STEP.
+    let alpha = 1;
+    if(x > W/2){
+      alpha = Math.max(0, Math.min(1, (W/2 + STEP - x) / STEP));
+    }
+    if(alpha <= 0) continue;
+    ctx.globalAlpha = alpha;
+
+    const green = cd.c >= cd.o;
+    const col   = green ? '#26a641' : '#e03c3c';
+
+    // Mèche
+    ctx.strokeStyle=col; ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(x, yp(cd.h));
+    ctx.lineTo(x, yp(cd.l));
+    ctx.stroke();
+
+    // Corps
+    const top = yp(Math.max(cd.o,cd.c));
+    const bot = yp(Math.min(cd.o,cd.c));
+    const bh  = Math.max(bot-top, 1.5);
+    if(bh < 2.5){
+      ctx.strokeStyle=col; ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(x-CW/2,top); ctx.lineTo(x+CW/2,top);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle=col;
+      ctx.fillRect(x-CW/2, top, CW, bh);
+    }
+  }
+  ctx.globalAlpha=1;
+}
+
+// ── Molette ──────────────────────────────────────────────────────
+const hint     = document.getElementById('hint');
+let   hintGone = false;
+
+window.addEventListener('wheel', e=>{
+  e.preventDefault();
+  if(!hintGone){ hint.style.opacity='0'; hintGone=true; }
+
+  let dy = e.deltaY;
+  if(e.deltaMode===1) dy*=20;   // lignes → px
+  if(e.deltaMode===2) dy*=400;  // pages → px
+
+  // scrolled est en nb de bougies. Le déplacement pixel = scrolled * STEP.
+  // Donc tout est synchronisé : 1 unité scrolled = 1 bougie = 1 STEP de glissement.
+  // On divise juste dy par 500 pour ralentir la molette.
+  scrolled = Math.max(0, scrolled + dy / 500);
+  draw();
+}, { passive:false });
+
+// Touch
+let ty=null;
+window.addEventListener('touchstart', e=>{ ty=e.touches[0].clientY; },{passive:true});
+window.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  if(ty===null) return;
+  const dy = ty - e.touches[0].clientY;
+  ty = e.touches[0].clientY;
+  if(!hintGone){ hint.style.opacity='0'; hintGone=true; }
+  scrolled = Math.max(0, scrolled + dy / 500);
+  draw();
+},{passive:false});
+
+draw();
+</script>
+</body>
+</html>

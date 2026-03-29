@@ -125,7 +125,7 @@ body {
 .nav-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
@@ -167,6 +167,7 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-left: auto;
 }
 
 .search-btn {

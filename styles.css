@@ -34,7 +34,7 @@ body { font-family: var(--font-body); color: var(--text-dark); background: var(-
 .search-btn:hover { color: var(--green); }
 .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .logo-bear { width: 52px; height: 52px; object-fit: contain; mix-blend-mode: screen; }
-.logo-text-img { height: 7px; object-fit: contain; mix-blend-mode: screen; }
+.logo-text-img { height: 14px; object-fit: contain; mix-blend-mode: screen; }
 .hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: flex-start; overflow: hidden; background: radial-gradient(ellipse at 70% 50%, rgba(0,30,80,0.5) 0%, transparent 60%), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80') center/cover no-repeat; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(8,16,34,0.88) 35%, rgba(8,16,34,0.4) 70%, transparent 100%); }
 .hero-content { position: relative; z-index: 2; max-width: 680px; padding: 0 6vw; padding-top: 80px; }
